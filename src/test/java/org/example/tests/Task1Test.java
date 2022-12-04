@@ -118,8 +118,8 @@ public class Task1Test {
         WebElement depDate = driver.findElement(By.xpath(depDateXPath));
         WebElement retDate = driver.findElement(By.xpath(retDateXPath));
         scrollToElementJs(depDate);
-        depDate.sendKeys("10.11.2022");
-        retDate.sendKeys("31.12.2022");
+        depDate.sendKeys("11.11.2022");
+        retDate.sendKeys("31.12.2023");
         retDate.sendKeys(Keys.ESCAPE);
 
         // Проверить заполнение полей
@@ -135,21 +135,47 @@ public class Task1Test {
                 depCity.getAttribute("value"));
         Assert.assertEquals("Город прибытия заполнен неверно","Шанхай, Китай",
                 arrCity.getAttribute("value"));
+
         depDate.click();
         String date1XPath = "//td[contains(@class,'ui-datepicker-current-day') and @data-event='click']";
         String day1XPath = date1XPath + "/a";
-        Assert.assertEquals("Год выбран правильно","2022",
+        Assert.assertEquals("Год выезда выбран неправильно","2022",
                 depDate.findElement(By.xpath(date1XPath)).getAttribute("data-year"));
-        Assert.assertEquals("Месяц выбран неправильно","10",
+        Assert.assertEquals("Месяц выезда выбран неправильно","10",
                 depDate.findElement(By.xpath(date1XPath)).getAttribute("data-month"));
-        Assert.assertEquals("День выбран неправильно","10",
+        Assert.assertEquals("День выезда выбран неправильно","11",
                 depDate.findElement(By.xpath(day1XPath)).getText());
         depDate.sendKeys(Keys.ESCAPE);
 
+        retDate.click();
+        Assert.assertEquals("Год возвращения выбран неправильно","2023",
+                depDate.findElement(By.xpath(date1XPath)).getAttribute("data-year"));
+        Assert.assertEquals("Месяц возвращения выбран неправильно","11",
+                depDate.findElement(By.xpath(date1XPath)).getAttribute("data-month"));
+        Assert.assertEquals("День возвращения выбран неправильно","31",
+                depDate.findElement(By.xpath(day1XPath)).getText());
+        depDate.sendKeys(Keys.ESCAPE);
 
+        // Нажать Сохранить и закрыть
+        String saveAndCloseXPath = "//button[contains(text(), 'Сохранить и закрыть')]";
+        WebElement saveAndClose = driver.findElement(By.xpath(saveAndCloseXPath));
+        waitUntilClickable(saveAndClose);
+        saveAndClose.click();
 
+        // Проверить сообщение об ошибке
+        String tripUsersErrorXPath = "//div[@data-ftid='crm_business_trip_users']/parent::*/following-sibling::*";
+        WebElement tripUsersError = driver.findElement(By.xpath(tripUsersErrorXPath));
+        waitUntilVisible(tripUsersError);
+        Assert.assertEquals("Сообщение об ошибке не появилось/некорректно",
+                "Список командируемых сотрудников не может быть пустым",
+                tripUsersError.getText());
 
-
+        String foreignUsersErrorXPath = "//div[@data-ftid='crm_business_trip_foreignUsers']/parent::*/following-sibling::*";
+        WebElement foreignUsersError = driver.findElement(By.xpath(foreignUsersErrorXPath));
+        waitUntilVisible(foreignUsersError);
+        Assert.assertEquals("Сообщение об ошибке не появилось/некорректно",
+                "Список командируемых сотрудников не может быть пустым",
+                foreignUsersError.getText());
     }
 
     @After
